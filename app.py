@@ -10,7 +10,7 @@ import json
 import plotly.utils 
 
 app = Flask(__name__)
-model = load_model("model.keras")
+model = load_model("model.h5")
 
 def plot_to_json(fig):
     return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
