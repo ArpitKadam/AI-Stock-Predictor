@@ -1,0 +1,744 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1 class="hero-title">
+            <i class="fas fa-chart-line"></i>
+            Stock Predictor AI
+        </h1>
+        <p class="hero-subtitle">
+            Advanced machine learning powered stock price predictions with interactive visualizations
+        </p>
+    </div>
+
+    <!-- Main Form -->
+    <div class="form-container">
+        <div class="glass-card p-4 p-md-5">
+            <div class="text-center mb-4">
+                <h3 class="mb-3">
+                    <i class="fas fa-search text-primary"></i>
+                    Analyze Stock Performance
+                </h3>
+                <p class="text-muted">Enter a stock symbol and prediction timeframe to get AI-powered forecasts</p>
+            </div>
+
+            <form method="POST" id="predictionForm">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="stock" class="form-label fw-semibold">
+                            <i class="fas fa-building"></i>
+                            Stock Symbol
+                        </label>
+                        <input 
+                            type="text" 
+                            class="form-control form-control-lg" 
+                            id="stock" 
+                            name="stock" 
+                            placeholder="e.g., AAPL, GOOGL, BTC-USD" 
+                            required
+                            autocomplete="off"
+                        >
+                        <div class="form-text">Enter any valid stock ticker symbol</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="prediction_mode" class="form-label fw-semibold">
+                            <i class="fas fa-calendar-alt"></i>
+                            Prediction Days
+                        </label>
+                        <div class="prediction-mode-container">
+                            <select class="form-select form-select-lg" id="prediction_mode" onchange="togglePredictionMode()">
+                                <option value="preset">Quick Select</option>
+                                <option value="custom">Custom Days</option>
+                            </select>
+                            
+                            <!-- Preset Options -->
+                            <select class="form-select form-select-lg mt-2" id="no_of_days_preset" name="no_of_days">
+                                <option value="5">5 Days</option>
+                                <option value="10" selected>10 Days</option>
+                                <option value="15">15 Days</option>
+                                <option value="30">30 Days</option>
+                            </select>
+                            
+                            <!-- Custom Input -->
+                            <div class="custom-days-container mt-2" style="display: none;">
+                                <input 
+                                    type="number" 
+                                    class="form-control form-control-lg" 
+                                    id="no_of_days_custom" 
+                                    name="no_of_days_custom"
+                                    placeholder="Enter days (1-60)"
+                                    min="1" 
+                                    max="60"
+                                    value="10"
+                                >
+                                <div class="form-text">Enter between 1-60 days for prediction</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                        <i class="fas fa-magic"></i>
+                        <span id="btnText">Predict Stock Price</span>
+                        <span id="btnSpinner" class="loading-spinner d-none"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Popular Stocks -->
+    <div class="mt-5">
+        <div class="text-center mb-4">
+            <h4 class="text-white">
+                <i class="fas fa-star"></i>
+                Popular Stocks
+            </h4>
+            <p class="text-white-50">Click on any card to flip and see details, or click the symbol to analyze</p>
+        </div>
+        
+        <div class="popular-stocks-grid">
+            <!-- Tech Giants -->
+            <div class="flip-card" data-symbol="AAPL">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Tech Giant</div>
+                        <div class="stock-symbol">AAPL</div>
+                        <div class="stock-name">Apple Inc.</div>
+                        <div class="stock-icon"><i class="fab fa-apple"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Apple Inc.</h6>
+                            <p><strong>Exchange:</strong> NASDAQ</p>
+                            <p><strong>Sector:</strong> Technology</p>
+                            <p><strong>Industry:</strong> Consumer Electronics</p>
+                            <p><strong>Market Cap:</strong> $3T+</p>
+                            <p class="description">World's most valuable company, known for iPhone, iPad, Mac, and services.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('AAPL')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="GOOGL">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Tech Giant</div>
+                        <div class="stock-symbol">GOOGL</div>
+                        <div class="stock-name">Alphabet Inc.</div>
+                        <div class="stock-icon"><i class="fab fa-google"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Alphabet Inc.</h6>
+                            <p><strong>Exchange:</strong> NASDAQ</p>
+                            <p><strong>Sector:</strong> Technology</p>
+                            <p><strong>Industry:</strong> Internet Services</p>
+                            <p><strong>Market Cap:</strong> $2T+</p>
+                            <p class="description">Google's parent company, leader in search, advertising, and cloud services.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('GOOGL')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="MSFT">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Tech Giant</div>
+                        <div class="stock-symbol">MSFT</div>
+                        <div class="stock-name">Microsoft</div>
+                        <div class="stock-icon"><i class="fab fa-microsoft"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Microsoft Corporation</h6>
+                            <p><strong>Exchange:</strong> NASDAQ</p>
+                            <p><strong>Sector:</strong> Technology</p>
+                            <p><strong>Industry:</strong> Software</p>
+                            <p><strong>Market Cap:</strong> $3T+</p>
+                            <p class="description">Leading software company with Windows, Office, Azure cloud, and AI services.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('MSFT')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="AMZN">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">E-commerce</div>
+                        <div class="stock-symbol">AMZN</div>
+                        <div class="stock-name">Amazon</div>
+                        <div class="stock-icon"><i class="fab fa-amazon"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Amazon.com Inc.</h6>
+                            <p><strong>Exchange:</strong> NASDAQ</p>
+                            <p><strong>Sector:</strong> Consumer Discretionary</p>
+                            <p><strong>Industry:</strong> E-commerce & Cloud</p>
+                            <p><strong>Market Cap:</strong> $1.5T+</p>
+                            <p class="description">Global e-commerce leader with AWS cloud services and Prime ecosystem.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('AMZN')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI & Innovation -->
+            <div class="flip-card" data-symbol="NVDA">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">AI Leader</div>
+                        <div class="stock-symbol">NVDA</div>
+                        <div class="stock-name">NVIDIA</div>
+                        <div class="stock-icon"><i class="fas fa-microchip"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>NVIDIA Corporation</h6>
+                            <p><strong>Exchange:</strong> NASDAQ</p>
+                            <p><strong>Sector:</strong> Technology</p>
+                            <p><strong>Industry:</strong> Semiconductors</p>
+                            <p><strong>Market Cap:</strong> $2T+</p>
+                            <p class="description">Leading AI chip maker powering machine learning and data centers worldwide.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('NVDA')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="TSLA">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Innovation</div>
+                        <div class="stock-symbol">TSLA</div>
+                        <div class="stock-name">Tesla Inc.</div>
+                        <div class="stock-icon"><i class="fas fa-car"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Tesla Inc.</h6>
+                            <p><strong>Exchange:</strong> NASDAQ</p>
+                            <p><strong>Sector:</strong> Consumer Discretionary</p>
+                            <p><strong>Industry:</strong> Electric Vehicles</p>
+                            <p><strong>Market Cap:</strong> $800B+</p>
+                            <p class="description">Electric vehicle pioneer with energy storage and autonomous driving technology.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('TSLA')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media & Communication -->
+            <div class="flip-card" data-symbol="META">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Social Media</div>
+                        <div class="stock-symbol">META</div>
+                        <div class="stock-name">Meta Platforms</div>
+                        <div class="stock-icon"><i class="fab fa-facebook"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Meta Platforms Inc.</h6>
+                            <p><strong>Exchange:</strong> NASDAQ</p>
+                            <p><strong>Sector:</strong> Technology</p>
+                            <p><strong>Industry:</strong> Social Media</p>
+                            <p><strong>Market Cap:</strong> $1T+</p>
+                            <p class="description">Owner of Facebook, Instagram, WhatsApp, and metaverse technologies.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('META')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="NFLX">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Streaming</div>
+                        <div class="stock-symbol">NFLX</div>
+                        <div class="stock-name">Netflix</div>
+                        <div class="stock-icon"><i class="fas fa-play"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Netflix Inc.</h6>
+                            <p><strong>Exchange:</strong> NASDAQ</p>
+                            <p><strong>Sector:</strong> Communication Services</p>
+                            <p><strong>Industry:</strong> Streaming Entertainment</p>
+                            <p><strong>Market Cap:</strong> $200B+</p>
+                            <p class="description">Global streaming leader with 250M+ subscribers and original content.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('NFLX')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Services -->
+            <div class="flip-card" data-symbol="JPM">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Banking</div>
+                        <div class="stock-symbol">JPM</div>
+                        <div class="stock-name">JPMorgan Chase</div>
+                        <div class="stock-icon"><i class="fas fa-university"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>JPMorgan Chase & Co.</h6>
+                            <p><strong>Exchange:</strong> NYSE</p>
+                            <p><strong>Sector:</strong> Financial Services</p>
+                            <p><strong>Industry:</strong> Banking</p>
+                            <p><strong>Market Cap:</strong> $500B+</p>
+                            <p class="description">Largest US bank by assets, offering investment banking and financial services.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('JPM')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="V">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Payments</div>
+                        <div class="stock-symbol">V</div>
+                        <div class="stock-name">Visa Inc.</div>
+                        <div class="stock-icon"><i class="fab fa-cc-visa"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Visa Inc.</h6>
+                            <p><strong>Exchange:</strong> NYSE</p>
+                            <p><strong>Sector:</strong> Financial Services</p>
+                            <p><strong>Industry:</strong> Payment Processing</p>
+                            <p><strong>Market Cap:</strong> $500B+</p>
+                            <p class="description">Global payments technology company processing trillions in transactions.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('V')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Healthcare & Consumer -->
+            <div class="flip-card" data-symbol="JNJ">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Healthcare</div>
+                        <div class="stock-symbol">JNJ</div>
+                        <div class="stock-name">Johnson & Johnson</div>
+                        <div class="stock-icon"><i class="fas fa-heartbeat"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Johnson & Johnson</h6>
+                            <p><strong>Exchange:</strong> NYSE</p>
+                            <p><strong>Sector:</strong> Healthcare</p>
+                            <p><strong>Industry:</strong> Pharmaceuticals</p>
+                            <p><strong>Market Cap:</strong> $400B+</p>
+                            <p class="description">Diversified healthcare giant with pharmaceuticals, medical devices, and consumer products.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('JNJ')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="PG">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Consumer Goods</div>
+                        <div class="stock-symbol">PG</div>
+                        <div class="stock-name">Procter & Gamble</div>
+                        <div class="stock-icon"><i class="fas fa-shopping-basket"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Procter & Gamble Co.</h6>
+                            <p><strong>Exchange:</strong> NYSE</p>
+                            <p><strong>Sector:</strong> Consumer Staples</p>
+                            <p><strong>Industry:</strong> Household Products</p>
+                            <p><strong>Market Cap:</strong> $350B+</p>
+                            <p class="description">Consumer goods giant with brands like Tide, Pampers, and Gillette.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('PG')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Energy & Industrial -->
+            <div class="flip-card" data-symbol="XOM">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Energy</div>
+                        <div class="stock-symbol">XOM</div>
+                        <div class="stock-name">ExxonMobil</div>
+                        <div class="stock-icon"><i class="fas fa-oil-can"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Exxon Mobil Corporation</h6>
+                            <p><strong>Exchange:</strong> NYSE</p>
+                            <p><strong>Sector:</strong> Energy</p>
+                            <p><strong>Industry:</strong> Oil & Gas</p>
+                            <p><strong>Market Cap:</strong> $400B+</p>
+                            <p class="description">Integrated oil and gas company with global exploration and refining operations.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('XOM')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="BA">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Aerospace</div>
+                        <div class="stock-symbol">BA</div>
+                        <div class="stock-name">Boeing</div>
+                        <div class="stock-icon"><i class="fas fa-plane"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>The Boeing Company</h6>
+                            <p><strong>Exchange:</strong> NYSE</p>
+                            <p><strong>Sector:</strong> Industrials</p>
+                            <p><strong>Industry:</strong> Aerospace & Defense</p>
+                            <p><strong>Market Cap:</strong> $150B+</p>
+                            <p class="description">Leading aerospace company manufacturing commercial airplanes and defense systems.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('BA')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Retail & Food -->
+            <div class="flip-card" data-symbol="WMT">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Retail</div>
+                        <div class="stock-symbol">WMT</div>
+                        <div class="stock-name">Walmart</div>
+                        <div class="stock-icon"><i class="fas fa-store"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Walmart Inc.</h6>
+                            <p><strong>Exchange:</strong> NYSE</p>
+                            <p><strong>Sector:</strong> Consumer Staples</p>
+                            <p><strong>Industry:</strong> Retail</p>
+                            <p><strong>Market Cap:</strong> $500B+</p>
+                            <p class="description">World's largest retailer with 10,500+ stores and growing e-commerce presence.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('WMT')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="KO">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Beverages</div>
+                        <div class="stock-symbol">KO</div>
+                        <div class="stock-name">Coca-Cola</div>
+                        <div class="stock-icon"><i class="fas fa-glass-whiskey"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>The Coca-Cola Company</h6>
+                            <p><strong>Exchange:</strong> NYSE</p>
+                            <p><strong>Sector:</strong> Consumer Staples</p>
+                            <p><strong>Industry:</strong> Beverages</p>
+                            <p><strong>Market Cap:</strong> $250B+</p>
+                            <p class="description">Iconic beverage company with 200+ brands sold in 190+ countries worldwide.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('KO')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="MCD">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Fast Food</div>
+                        <div class="stock-symbol">MCD</div>
+                        <div class="stock-name">McDonald's</div>
+                        <div class="stock-icon"><i class="fas fa-hamburger"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>McDonald's Corporation</h6>
+                            <p><strong>Exchange:</strong> NYSE</p>
+                            <p><strong>Sector:</strong> Consumer Discretionary</p>
+                            <p><strong>Industry:</strong> Restaurants</p>
+                            <p><strong>Market Cap:</strong> $200B+</p>
+                            <p class="description">Global fast-food chain with 40,000+ restaurants in 100+ countries.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('MCD')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semiconductors & Emerging -->
+            <div class="flip-card" data-symbol="AMD">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Semiconductors</div>
+                        <div class="stock-symbol">AMD</div>
+                        <div class="stock-name">Advanced Micro Devices</div>
+                        <div class="stock-icon"><i class="fas fa-microchip"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Advanced Micro Devices</h6>
+                            <p><strong>Exchange:</strong> NASDAQ</p>
+                            <p><strong>Sector:</strong> Technology</p>
+                            <p><strong>Industry:</strong> Semiconductors</p>
+                            <p><strong>Market Cap:</strong> $200B+</p>
+                            <p class="description">CPU and GPU manufacturer competing with Intel and NVIDIA in computing.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('AMD')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="INTC">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Semiconductors</div>
+                        <div class="stock-symbol">INTC</div>
+                        <div class="stock-name">Intel</div>
+                        <div class="stock-icon"><i class="fas fa-microchip"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Intel Corporation</h6>
+                            <p><strong>Exchange:</strong> NASDAQ</p>
+                            <p><strong>Sector:</strong> Technology</p>
+                            <p><strong>Industry:</strong> Semiconductors</p>
+                            <p><strong>Market Cap:</strong> $150B+</p>
+                            <p class="description">Leading processor manufacturer for PCs, servers, and data centers.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('INTC')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cryptocurrencies -->
+            <div class="flip-card" data-symbol="BTC-USD">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Cryptocurrency</div>
+                        <div class="stock-symbol">BTC-USD</div>
+                        <div class="stock-name">Bitcoin</div>
+                        <div class="stock-icon"><i class="fab fa-bitcoin"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Bitcoin</h6>
+                            <p><strong>Type:</strong> Cryptocurrency</p>
+                            <p><strong>Symbol:</strong> BTC</p>
+                            <p><strong>Launch:</strong> 2009</p>
+                            <p><strong>Market Cap:</strong> $1T+</p>
+                            <p class="description">First and largest cryptocurrency, digital gold and store of value.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('BTC-USD')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="ETH-USD">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Cryptocurrency</div>
+                        <div class="stock-symbol">ETH-USD</div>
+                        <div class="stock-name">Ethereum</div>
+                        <div class="stock-icon"><i class="fab fa-ethereum"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Ethereum</h6>
+                            <p><strong>Type:</strong> Cryptocurrency</p>
+                            <p><strong>Symbol:</strong> ETH</p>
+                            <p><strong>Launch:</strong> 2015</p>
+                            <p><strong>Market Cap:</strong> $400B+</p>
+                            <p class="description">Smart contract platform powering DeFi, NFTs, and decentralized applications.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('ETH-USD')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW STOCKS - 3 Additional -->
+            <div class="flip-card" data-symbol="DIS">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Entertainment</div>
+                        <div class="stock-symbol">DIS</div>
+                        <div class="stock-name">Disney</div>
+                        <div class="stock-icon"><i class="fas fa-magic"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>The Walt Disney Company</h6>
+                            <p><strong>Exchange:</strong> NYSE</p>
+                            <p><strong>Sector:</strong> Communication Services</p>
+                            <p><strong>Industry:</strong> Entertainment</p>
+                            <p><strong>Market Cap:</strong> $200B+</p>
+                            <p class="description">Global entertainment conglomerate with theme parks, movies, and streaming services.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('DIS')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="UBER">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Mobility</div>
+                        <div class="stock-symbol">UBER</div>
+                        <div class="stock-name">Uber Technologies</div>
+                        <div class="stock-icon"><i class="fas fa-car-side"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Uber Technologies Inc.</h6>
+                            <p><strong>Exchange:</strong> NYSE</p>
+                            <p><strong>Sector:</strong> Technology</p>
+                            <p><strong>Industry:</strong> Ride-sharing & Delivery</p>
+                            <p><strong>Market Cap:</strong> $150B+</p>
+                            <p class="description">Leading ride-sharing and food delivery platform operating globally.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('UBER')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" data-symbol="SPOT">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="stock-category">Music Streaming</div>
+                        <div class="stock-symbol">SPOT</div>
+                        <div class="stock-name">Spotify</div>
+                        <div class="stock-icon"><i class="fab fa-spotify"></i></div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="stock-details">
+                            <h6>Spotify Technology S.A.</h6>
+                            <p><strong>Exchange:</strong> NYSE</p>
+                            <p><strong>Sector:</strong> Communication Services</p>
+                            <p><strong>Industry:</strong> Audio Streaming</p>
+                            <p><strong>Market Cap:</strong> $50B+</p>
+                            <p class="description">World's largest music streaming platform with 500M+ users globally.</p>
+                            <button class="btn btn-sm btn-light" onclick="selectStock('SPOT')">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mt-5">
+        <div class="col-md-4 mb-3">
+            <div class="glass-card p-4 text-center h-100">
+                <i class="fas fa-brain text-primary" style="font-size: 3rem;"></i>
+                <h5 class="mt-3 text-dark">AI Predictions</h5>
+                <p class="text-muted">Advanced neural networks trained on historical market data</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="glass-card p-4 text-center h-100">
+                <i class="fas fa-chart-area text-success" style="font-size: 3rem;"></i>
+                <h5 class="mt-3 text-dark">Interactive Charts</h5>
+                <p class="text-muted">Beautiful visualizations of historical and predicted prices</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="glass-card p-4 text-center h-100">
+                <i class="fas fa-clock text-warning" style="font-size: 3rem;"></i>
+                <h5 class="mt-3 text-dark">Real-time Data</h5>
+                <p class="text-muted">Live market data with up-to-date price information</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function selectStock(symbol) {
+        document.getElementById('stock').value = symbol;
+        document.getElementById('stock').focus();
+    }
+
+    function togglePredictionMode() {
+        const mode = document.getElementById('prediction_mode').value;
+        const presetContainer = document.getElementById('no_of_days_preset');
+        const customContainer = document.querySelector('.custom-days-container');
+        
+        if (mode === 'custom') {
+            presetContainer.style.display = 'none';
+            presetContainer.removeAttribute('name');
+            customContainer.style.display = 'block';
+            document.getElementById('no_of_days_custom').setAttribute('name', 'no_of_days');
+        } else {
+            presetContainer.style.display = 'block';
+            presetContainer.setAttribute('name', 'no_of_days');
+            customContainer.style.display = 'none';
+            document.getElementById('no_of_days_custom').removeAttribute('name');
+        }
+    }
+
+    document.getElementById('predictionForm').addEventListener('submit', function(e) {
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+        
+        // Validate custom input if selected
+        const mode = document.getElementById('prediction_mode').value;
+        if (mode === 'custom') {
+            const customDays = parseInt(document.getElementById('no_of_days_custom').value);
+            if (!customDays || customDays < 1 || customDays > 60) {
+                e.preventDefault();
+                alert('Please enter a valid number of days between 1 and 60.');
+                return;
+            }
+        }
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        btnText.textContent = 'Analyzing...';
+        btnSpinner.classList.remove('d-none');
+    });
+
+    // Auto-complete for stock symbols
+    const stockInput = document.getElementById('stock');
+    stockInput.addEventListener('input', function(e) {
+        this.value = this.value.toUpperCase();
+    });
+
+    // Flip card functionality
+    document.querySelectorAll('.flip-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Don't flip if clicking the analyze button
+            if (e.target.tagName === 'BUTTON') {
+                return;
+            }
+            this.classList.toggle('flipped');
+        });
+    });
+
+    // Add hover effects and animations
+    document.querySelectorAll('.flip-card').forEach((card, index) => {
+        // Stagger the initial animation
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 50);
+    });
+</script>
+{% endblock %}
