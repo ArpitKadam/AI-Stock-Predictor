@@ -1,4 +1,4 @@
-# 🪙 CryptoCurrency Price Predictor
+# 🪙 AI Price Predictor
 
 A Flask-based web application that uses deep learning to predict cryptocurrency prices. This project combines data visualization (Plotly), financial data extraction (yfinance), and machine learning (TensorFlow/Keras) for interactive price forecasting.
 
